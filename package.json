@@ -1,0 +1,20 @@
+{
+  "description": "Opens a popover with command buttons when user highlights text on the editor",
+  "name": "ep_highlight_popover",
+  "version": "0.0.1",
+  "author": {
+    "name": "Luiza Pagliari",
+    "email": "lpagliari@gmail.com"
+  },
+  "contributors": [],
+  "dependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "homepage": "https://github.com/storytouch/ep_highlight_popover",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/storytouch/ep_highlight_popover.git"
+  }
+}

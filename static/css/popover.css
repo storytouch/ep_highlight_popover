@@ -1,0 +1,48 @@
+/* overwrite values from Etherpad pad.css */
+.toolbar {
+  position: absolute;
+  z-index: 99999;
+  display: none;
+  overflow: visible;
+  background: #f7f7f7;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 8px;
+  width: auto;
+}
+
+.toolbar ul {
+  position: relative;
+  margin: 0 5px;
+}
+
+/* The triangle on the balloon
+   Based on http://nicolasgallagher.com/pure-css-speech-bubbles/demo/
+ */
+/* the larger triangle */
+.toolbar:before {
+  content: "";
+  position: absolute;
+  top: -10px; /* value = - border-top-width - border-bottom-width */
+  left: 13px; /* controls horizontal position */
+  border-width:  0 9px 10px;
+  border-style: solid;
+  border-color: #ccc transparent;
+  /* reduce the damage in FF3.0 */
+  display: block;
+  width: 0;
+}
+
+/* the smaller triangle */
+.toolbar:after {
+  content: "";
+  position: absolute;
+  top: -8px; /* value = - border-top-width - border-bottom-width */
+  left: 15px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+  border-width: 0 7px 8px;
+  border-style: solid;
+  border-color: #f7f7f7 transparent;
+  /* reduce the damage in FF3.0 */
+  display: block;
+  width: 0;
+}

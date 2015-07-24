@@ -1,0 +1,13 @@
+{
+  "parts": [
+    {
+      "name": "highlight_popover",
+      "pre": ["ep_comments_page/comments_page"],
+      "client_hooks": {
+        "aceEditorCSS": "ep_highlight_popover/static/js/index",
+        "postAceInit": "ep_highlight_popover/static/js/index"
+      },
+      "hooks": {}
+    }
+  ]
+}
