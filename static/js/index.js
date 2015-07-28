@@ -177,13 +177,18 @@ var firstSelectedCharPosition = function() {
   var padInnerWindow = getPadInner().get(0).contentWindow;
   if (padInnerWindow.getSelection) { // won't work before IE9
     var selectedText = padInnerWindow.getSelection();
-    var dummy = getOrCreateDummySpan().get(0);
+    var dummy = getOrCreateDummySpan();
 
-    var range = selectedText.getRangeAt(0);
     newRange = $('iframe[name="ace_outer"]').get(0).ownerDocument.createRange();
-    newRange.setStart(selectedText.focusNode, range.startOffset + 1); // +1 is to avoid inserting the <span> on the wrong line
-    newRange.insertNode(dummy);
-    position = dummy.getBoundingClientRect();
+
+    var offset = selectedText.focusOffset;
+    // Backwards selection puts popover on the last char before selection first char,
+    // so we need an adjustment
+    if (isSelectionBackwards(selectedText)) offset++;
+
+    newRange.setStart(selectedText.focusNode, offset);
+    newRange.insertNode(dummy.get(0));
+    position = dummy.get(0).getBoundingClientRect();
   }
 
   return position;
@@ -199,6 +204,18 @@ var getOrCreateDummySpan = function() {
   }
 
   return dummy;
+}
+
+// Based on http://stackoverflow.com/a/8039026
+var isSelectionBackwards = function(selection) {
+  var backwards = false;
+  if (!selection.isCollapsed) {
+      var range = getPadInner().get(0).ownerDocument.createRange();
+      range.setStart(selection.anchorNode, selection.anchorOffset);
+      range.setEnd(selection.focusNode, selection.focusOffset);
+      backwards = range.collapsed;
+  }
+  return backwards;
 }
 
 var scrollViewportIfPopoverIsNotVisible = function(cssProperties) {
