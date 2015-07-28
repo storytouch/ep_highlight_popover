@@ -177,19 +177,28 @@ var firstSelectedCharPosition = function() {
   var padInnerWindow = getPadInner().get(0).contentWindow;
   if (padInnerWindow.getSelection) { // won't work before IE9
     var selectedText = padInnerWindow.getSelection();
-
-    getPadOuter().find("body").append("<span id='popover-target'></span>");
-    var dummy = getPadOuter().find('#popover-target');
+    var dummy = getOrCreateDummySpan().get(0);
 
     var range = selectedText.getRangeAt(0);
     newRange = $('iframe[name="ace_outer"]').get(0).ownerDocument.createRange();
     newRange.setStart(selectedText.focusNode, range.startOffset + 1); // +1 is to avoid inserting the <span> on the wrong line
-    newRange.insertNode(dummy.get(0));
-    position = dummy.get(0).getBoundingClientRect();
-    dummy.remove();
+    newRange.insertNode(dummy);
+    position = dummy.getBoundingClientRect();
   }
 
   return position;
+}
+
+var getOrCreateDummySpan = function() {
+  var dummy = getPadOuter().find('#popover-target');
+
+  // create dummy <span> if does not exist
+  if (dummy.length === 0) {
+    getPadOuter().find("body").append("<span id='popover-target'></span>");
+    dummy = getPadOuter().find('#popover-target');
+  }
+
+  return dummy;
 }
 
 var scrollViewportIfPopoverIsNotVisible = function(cssProperties) {
