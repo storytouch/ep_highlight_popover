@@ -182,11 +182,19 @@ var firstSelectedCharPosition = function() {
     newRange = $('iframe[name="ace_outer"]').get(0).ownerDocument.createRange();
 
     var offset = selectedText.focusOffset;
-    // Backwards selection puts popover on the last char before selection first char,
-    // so we need an adjustment
-    if (isSelectionBackwards(selectedText)) offset++;
+    var target = selectedText.focusNode;
+    if (isSelectionBackwards(selectedText)) {
+      // Backwards selection puts popover on the last char before selection first char,
+      // so we need an adjustment
+      offset++;
+    } else if (offset === 0) {
+      // If selection ends on the end of an ace-line, popover might be placed on a weird
+      // position, so we need an adjustment
+      target = lastTextNodeOfPreviousLine(target);
+      offset = target.length;
+    }
 
-    newRange.setStart(selectedText.focusNode, offset);
+    newRange.setStart(target, offset);
     newRange.insertNode(dummy.get(0));
     position = dummy.get(0).getBoundingClientRect();
   }
@@ -216,6 +224,38 @@ var isSelectionBackwards = function(selection) {
       backwards = range.collapsed;
   }
   return backwards;
+}
+
+// Gets the last text node on the ace-line before the line where rootElement is
+var lastTextNodeOfPreviousLine = function(rootElement) {
+  var lineWithRootElement = $(rootElement).closest("#innerdocbody > div");
+  var previousLine = lineWithRootElement.prev();
+
+  return lastTextNodeOf(previousLine.get(0));
+}
+
+// Gets the last text node of the rootElement
+var lastTextNodeOf = function(rootElement) {
+  var lastTextNode = null;
+  var children = $(rootElement).contents();
+
+  // if root is a leaf (has no children), we return it itself if it is a text node
+  if (children.length === 0) {
+    if (rootElement.nodeType === Node.TEXT_NODE) return rootElement;
+    return null;
+  }
+
+  // otherwise we iterate its children from last to first
+  $(children.get().reverse()).each(function() {
+    var textNode = lastTextNodeOf(this);
+
+    if (textNode) {
+      lastTextNode = textNode;
+      return false; // to break the loop
+    }
+  });
+
+  return lastTextNode;
 }
 
 var scrollViewportIfPopoverIsNotVisible = function(cssProperties) {
