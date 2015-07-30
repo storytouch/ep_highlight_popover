@@ -197,6 +197,7 @@ var firstSelectedCharPosition = function() {
     newRange.setStart(target, offset);
     newRange.insertNode(dummy.get(0));
     position = dummy.get(0).getBoundingClientRect();
+    dummy.remove();
   }
 
   return position;
@@ -271,6 +272,27 @@ var scrollViewportIfPopoverIsNotVisible = function(cssProperties) {
   }
 }
 
+// 'selectionchange' is triggered several times while user is changing selected text,
+// so we need to make sure user is done to avoid calling the callback multiple times.
+var waitForSelectionChangeToFinishThenCall = function(callback) {
+  var selectionChangeTimer;
+  getPadInner().contents().on('selectionchange', function(e) {
+    clearTimeout(selectionChangeTimer);
+    selectionChangeTimer = setTimeout(callback, 200);
+  });
+}
+
+var updatePopover = function(ace) {
+  // If we don't have a selection then we hide command options
+  var noTextSelected = checkNoTextSelected(ace);
+  if (noTextSelected) {
+    getPopover().hide();
+    return;
+  }
+
+  displayPopoverOnCorrectPosition();
+}
+
 /* ***** Public methods: ***** */
 
 exports.aceEditorCSS = function(){
@@ -284,17 +306,15 @@ exports.postAceInit = function(hook, context){
   // Create popover container
   createPopover();
 
+  waitForSelectionChangeToFinishThenCall(function() {
+    updatePopover(ace);
+  });
+
+  // Any event that might trigger a selection change on the editor
   getPadInner().contents().on('mouseup touchend keydown', function(e) {
     // use timeout to leave some time for text selection to be updated
     setTimeout(function() {
-      // If we don't have a selection then we hide command options
-      var noTextSelected = checkNoTextSelected(ace);
-      if (noTextSelected) {
-        getPopover().hide();
-        return;
-      }
-
-      displayPopoverOnCorrectPosition();
+      updatePopover(ace);
     }, 0);
   });
 };
