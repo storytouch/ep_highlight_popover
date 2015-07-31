@@ -274,7 +274,7 @@ var waitForSelectionChangeToFinishThenCall = function(callback) {
   var selectionChangeTimer;
   getPadInner().contents().on('selectionchange', function(e) {
     clearTimeout(selectionChangeTimer);
-    selectionChangeTimer = setTimeout(callback, 200);
+    selectionChangeTimer = setTimeout(callback, 400); // timeout cannot be too soon otherwise the click on the button will happen after selection is lost
   });
 }
 
