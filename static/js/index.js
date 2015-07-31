@@ -26,18 +26,14 @@ var getPopover = function() {
 }
 
 // Indicates if user selected some text on editor
-var checkNoTextSelected = function(ace) {
-  var rep = {};
+var checkNoTextSelected = function() {
+  var noTextSelected = true;
 
-  ace.callWithAce(function(ace) {
-    var saveRep = ace.ace_getRep();
-
-    rep.lines    = saveRep.lines;
-    rep.selStart = saveRep.selStart;
-    rep.selEnd   = saveRep.selEnd;
-  },'checkTextIsSelected', true);
-
-  var noTextSelected = (rep.selStart[0] == rep.selEnd[0] && rep.selStart[1] == rep.selEnd[1]);
+  var padInnerWindow = getPadInner().get(0).contentWindow;
+  if (padInnerWindow.getSelection) { // won't work before IE9
+    var selectedText = padInnerWindow.getSelection();
+    noTextSelected = selectedText.toString().length === 0;
+  }
 
   return noTextSelected;
 }
@@ -282,9 +278,9 @@ var waitForSelectionChangeToFinishThenCall = function(callback) {
   });
 }
 
-var updatePopover = function(ace) {
+var updatePopover = function() {
   // If we don't have a selection then we hide command options
-  var noTextSelected = checkNoTextSelected(ace);
+  var noTextSelected = checkNoTextSelected();
   if (noTextSelected) {
     getPopover().hide();
     return;
@@ -301,20 +297,18 @@ exports.aceEditorCSS = function(){
 
 // Create popover and bind events to show/hide it
 exports.postAceInit = function(hook, context){
-  var ace = context.ace;
-
   // Create popover container
   createPopover();
 
   waitForSelectionChangeToFinishThenCall(function() {
-    updatePopover(ace);
+    updatePopover();
   });
 
   // Any event that might trigger a selection change on the editor
   getPadInner().contents().on('mouseup touchend keydown', function(e) {
     // use timeout to leave some time for text selection to be updated
     setTimeout(function() {
-      updatePopover(ace);
+      updatePopover();
     }, 0);
   });
 };
