@@ -47,3 +47,14 @@
   display: block;
   width: 0;
 }
+
+/* adjust horizontal position of triangles for smaller devices, so it is
+   centered on first button */
+@media screen and (max-width: 600px) {
+  .toolbar:before {
+    left: 10px;
+  }
+  .toolbar:after {
+    left: 12px;
+  }
+}
