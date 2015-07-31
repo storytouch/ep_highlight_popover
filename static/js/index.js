@@ -115,7 +115,8 @@ var addCommandsToPopover = function() {
 
 var createActionsOnButtons = function() {
   // Add Comment button
-  getPopover().on('click', '.addComment', function(e) {
+  getPopover().on('touchstart click', '.addComment', function(e) {
+    e.stopImmediatePropagation(); // to avoid clicking on addComment on touch and click
     $('.addComment').click();
   });
 }
@@ -158,7 +159,7 @@ var getPopoverPosition = function(cssProperties) {
     var positionOfMiddleOfPopoverTriangle = cssProperties.left + 1.5* cssProperties.border;
     var padInnerOffset = getPadInner().offset();
 
-    var top  = padInnerOffset.top + targetPosition.bottom + 4; // +4: adding some padding
+    var top  = padInnerOffset.top + targetPosition.bottom + 8; // +8: adding some padding
     var left = padInnerOffset.left + targetPosition.left - positionOfMiddleOfPopoverTriangle;
 
     popoverPosition = { top: top+"px", left: left+"px"};
@@ -279,14 +280,25 @@ var waitForSelectionChangeToFinishThenCall = function(callback) {
 }
 
 var updatePopover = function() {
+  var popoverWasClosed = closePopoverIfNoTextIsSelected();
+
+  if (!popoverWasClosed) {
+    displayPopoverOnCorrectPosition();
+  }
+}
+
+// Hide popover if no text is selected on editor, and return if popover was closed
+var closePopoverIfNoTextIsSelected = function() {
+  var popoverWasClosed = false;
+
   // If we don't have a selection then we hide command options
   var noTextSelected = checkNoTextSelected();
   if (noTextSelected) {
     getPopover().hide();
-    return;
+    popoverWasClosed = true;
   }
 
-  displayPopoverOnCorrectPosition();
+  return popoverWasClosed;
 }
 
 /* ***** Public methods: ***** */
