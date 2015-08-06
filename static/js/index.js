@@ -117,6 +117,7 @@ var createActionsOnButtons = function() {
   // Add Comment button
   getPopover().on('touchstart click', '.addComment', function(e) {
     e.stopImmediatePropagation(); // to avoid clicking on addComment on touch and click
+    e.preventDefault(); // to avoid text under the popover to be selected when user simply wants to click on popover buttons
     $('.addComment').click();
   });
 }
